@@ -1,0 +1,5 @@
+#
+# pylint configuration for pyvb package
+#
+#   $ pylint --rcfile=src/pyvb/pylintrc src/pyvb
+#
