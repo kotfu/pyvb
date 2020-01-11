@@ -20,15 +20,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-"""
-pyvb - Python Virtual Environment Builder
-"""
-
-from pkg_resources import get_distribution, DistributionNotFound
-
-from .pyvb import find_latest_version  # noqa: F401
-
-try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
-    __version__ = 'unknown'

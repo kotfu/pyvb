@@ -20,15 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-"""
-pyvb - Python Virtual Environment Builder
-"""
 
-from pkg_resources import get_distribution, DistributionNotFound
+import pyvb
 
-from .pyvb import find_latest_version  # noqa: F401
-
-try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
-    __version__ = 'unknown'
+def test_find_latest_version(mocker, pythons):
+    pyfunc = mocker.patch("pyvb.pyvb._get_pythons")
+    pyfunc.return_value = pythons
+    assert pyvb.find_latest_version('3.8') == '3.8.1'
+    assert pyvb.find_latest_version('1.4') is None
+    assert pyvb.find_latest_version('fred') is None
+    assert pyvb.find_latest_version('3.9') is None

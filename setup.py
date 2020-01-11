@@ -52,7 +52,8 @@ setup(
     # dependencies for development and testing
     # $ pip install -e .[dev]
     extras_require={
-        'dev': ['pylint', 'flake8',
+        'dev': ['pytest', 'pytest-cov', 'pytest-mock',
+                'pylint', 'flake8',
                 'setuptools_scm', 'wheel', 'twine', 'rope', 'invoke',
                 ],
     },
