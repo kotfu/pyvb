@@ -25,12 +25,12 @@ Entry point for 'pyvb' command line program
 """
 import sys
 
+import pyvb
+
 
 def main(argv=None):
     """Entry point for 'pyvb' command line program"""
-    if argv:
-        pass
-    return 0
+    return pyvb.main(argv)
 
 
 if __name__ == '__main__':

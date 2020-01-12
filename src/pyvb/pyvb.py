@@ -28,6 +28,13 @@ import subprocess
 import re
 
 
+def main(argv=None):
+    """Entry point for 'pyvb' command line program"""
+    if argv:
+        pass
+    return 0
+
+
 def _get_pythons():
     """Get a list of pythons that are available to us"""
     process = subprocess.run(

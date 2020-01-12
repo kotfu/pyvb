@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-import pyvb
+import pyvb.pyvb as pyvb
 
 def test_find_latest_version(mocker, pythons):
     pyfunc = mocker.patch("pyvb.pyvb._get_pythons")
