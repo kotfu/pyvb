@@ -27,6 +27,7 @@ import sys
 
 import pyvb
 
+
 def main(argv=None):
     """Entry point for 'pyvb' command line program"""
     prog = pyvb.Pyvb()

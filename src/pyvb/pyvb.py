@@ -30,6 +30,7 @@ import re
 
 import pyvb
 
+
 class Environment():
     """Data class to hold info about a particular python environment"""
     majmin_re = re.compile(r'\d+\.\d+')
@@ -85,8 +86,12 @@ class Pyvb():
                             help=verbose_help
                             )
 
-        version_help = 'display version number and exit'
-        parser.add_argument('--version', action='store_true', default=False, help=version_help)
+        version_help = 'show the version of pyvb and exit'
+        parser.add_argument('--version',
+                            action='version',
+                            version=pyvb.__version__,
+                            help=version_help
+                            )
 
         return parser
 
@@ -105,10 +110,6 @@ class Pyvb():
         """
         parser = self._build_parser()
         args = parser.parse_args(argv)
-
-        if args.version:
-            print(pyvb.__version__)
-            return 0
 
         self.dryrun = args.dry_run
         self.verbose = args.verbose
