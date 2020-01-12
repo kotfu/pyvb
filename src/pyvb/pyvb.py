@@ -30,7 +30,7 @@ import re
 
 import pyvb
 
-
+# pylint: disable=too-few-public-methods
 class Environment():
     """Data class to hold info about a particular python environment"""
     majmin_re = re.compile(r'\d+\.\d+')
@@ -57,7 +57,8 @@ class Pyvb():
         self.dryrun = False
         self.verbose = False
 
-    def _build_parser(self):
+    @classmethod
+    def _build_parser(cls):
         """Build the argument parser"""
         parser = argparse.ArgumentParser(
             description='Create pyenv and virtualenv python environments',
@@ -69,7 +70,7 @@ class Pyvb():
         # write_help = 'write created environment names to .python-version in the current directory'
         # parser.add_argument('-w', '--write', action='store_true', help=write_help)
 
-        # append_help = 'append created environment names to .python-version in the current directory'
+        # append_help = 'created environment names to .python-version in the current directory'
         # parser.add_argument('-a', '--append', action='store_true', help=append_help)
 
         dryrun_help = "Don't execute anything, but show what would be done. Implies -v."
@@ -165,14 +166,16 @@ class Pyvb():
         )
         return process.returncode == 0
 
-    def minor_pythons(self):
+    @classmethod
+    def minor_pythons(cls):
         """Return a list of standard python major.minor versions
 
         Standard python versions are those that are not deprecated.
         """
         return ["3.8", "3.7", "3.6", "3.5"]
 
-    def find_latest_version(self, pythons, major_minor):
+    @classmethod
+    def find_latest_version(cls, pythons, major_minor):
         """Given a major.minor specifier, find the latest available python version to pyenv
 
         >>> pythons = getfixture('pythons')
