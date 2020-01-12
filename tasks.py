@@ -50,7 +50,10 @@ namespace_clean.add_task(pytest_clean, 'pytest')
 @invoke.task
 def pylint(context):
     "Check code quality using pylint"
-    context.run('pylint --rcfile=src/pyvb/pylintrc src/pyvb')
+    print("linting src/pyvb/")
+    context.run('pylint --rcfile=src/pyvb/.pylintrc src/pyvb', warn=True)
+    print("linting tests/")
+    context.run('pylint --rcfile=tests/.pylintrc tests', warn=True)
 namespace.add_task(pylint)
 
 # flake8 - linter and tool for style guide enforcement and linting
