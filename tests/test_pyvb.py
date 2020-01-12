@@ -20,13 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
+"""
+pyvb test suite
+"""
 
-import pyvb.pyvb as pyvb
+import pyvb
 
-def test_find_latest_version(mocker, pythons):
-    pyfunc = mocker.patch("pyvb.pyvb._get_pythons")
-    pyfunc.return_value = pythons
-    assert pyvb.find_latest_version('3.8') == '3.8.1'
-    assert pyvb.find_latest_version('1.4') is None
-    assert pyvb.find_latest_version('fred') is None
-    assert pyvb.find_latest_version('3.9') is None
+def test_find_latest_version(pythons):
+    #pyfunc = mocker.patch("pyvb.pyvb.get_pythons")
+    #pyfunc.return_value = pythons
+    prog = pyvb.Pyvb()
+    assert prog.find_latest_version(pythons, '3.8') == '3.8.1'
+    assert prog.find_latest_version(pythons, '1.4') is None
+    assert prog.find_latest_version(pythons, 'fred') is None
+    assert prog.find_latest_version(pythons, '3.9') is None
+
+def test_environment():
+    env = pyvb.pyvb.Environment('fred', '3.8.1')
+    assert env.major_minor == '3.8'

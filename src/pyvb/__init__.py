@@ -26,8 +26,7 @@ pyvb - Python Virtual Environment Builder
 
 from pkg_resources import get_distribution, DistributionNotFound
 
-from .pyvb import find_latest_version  # noqa: F401
-from .pyvb import main  # noqa: F401
+from .pyvb import Pyvb  # noqa F401
 
 try:
     __version__ = get_distribution(__name__).version

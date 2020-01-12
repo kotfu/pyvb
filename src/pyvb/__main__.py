@@ -27,10 +27,10 @@ import sys
 
 import pyvb
 
-
 def main(argv=None):
     """Entry point for 'pyvb' command line program"""
-    return pyvb.main(argv)
+    prog = pyvb.Pyvb()
+    return prog.main(argv)
 
 
 if __name__ == '__main__':
