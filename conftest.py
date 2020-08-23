@@ -3,6 +3,7 @@
 
 import pytest
 
+
 @pytest.fixture
 def pythons():
     """A list (not a string) of python versions"""
@@ -401,4 +402,6 @@ def pythons():
   stackless-3.4.2
   stackless-3.4.7
   stackless-3.5.4
-""".split('\n')
+""".split(
+        "\n"
+    )

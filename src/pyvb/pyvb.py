@@ -31,9 +31,10 @@ import re
 import pyvb
 
 # pylint: disable=too-few-public-methods
-class Environment():
+class Environment:
     """Data class to hold info about a particular python environment"""
-    majmin_re = re.compile(r'\d+\.\d+')
+
+    majmin_re = re.compile(r"\d+\.\d+")
 
     def __init__(self, name=None, version=None):
         self.name = name
@@ -49,7 +50,7 @@ class Environment():
         return None
 
 
-class Pyvb():
+class Pyvb:
     """pyvb command line program class"""
 
     def __init__(self):
@@ -61,11 +62,11 @@ class Pyvb():
     def _build_parser(cls):
         """Build the argument parser"""
         parser = argparse.ArgumentParser(
-            description='Create pyenv and virtualenv python environments',
+            description="Create pyenv and virtualenv python environments",
         )
 
-        basename_help = 'the base environment name'
-        parser.add_argument('basename', help=basename_help)
+        basename_help = "the base environment name"
+        parser.add_argument("basename", help=basename_help)
 
         # write_help = 'write created environment names to .python-version in the current directory'
         # parser.add_argument('-w', '--write', action='store_true', help=write_help)
@@ -74,32 +75,26 @@ class Pyvb():
         # parser.add_argument('-a', '--append', action='store_true', help=append_help)
 
         dryrun_help = "Don't execute anything, but show what would be done. Implies -v."
-        parser.add_argument('--dry-run', '-n',
-                            action='store_true',
-                            default=False,
-                            help=dryrun_help
-                            )
+        parser.add_argument(
+            "--dry-run", "-n", action="store_true", default=False, help=dryrun_help
+        )
 
-        verbose_help = 'Display progress information about progress'
-        parser.add_argument('-v', '--verbose',
-                            action='store_true',
-                            default=False,
-                            help=verbose_help
-                            )
+        verbose_help = "Display progress information about progress"
+        parser.add_argument(
+            "-v", "--verbose", action="store_true", default=False, help=verbose_help
+        )
 
-        version_help = 'show the version of pyvb and exit'
-        parser.add_argument('--version',
-                            action='version',
-                            version=pyvb.__version__,
-                            help=version_help
-                            )
+        version_help = "show the version of pyvb and exit"
+        parser.add_argument(
+            "--version", action="version", version=pyvb.__version__, help=version_help
+        )
 
         return parser
 
     def status_message(self, msg):
         """display a status message"""
         if self.verbose:
-            print('pyvb: {}'.format(msg))
+            print("pyvb: {}".format(msg))
 
     def main(self, argv=None):
         """Entry point for 'pyvb' command line program
@@ -118,7 +113,7 @@ class Pyvb():
             self.verbose = True
 
         if not self.have_pyenv():
-            msg = '{0}: {0} requires pyenv, which is not installed'.format(parser.prog)
+            msg = "{0}: {0} requires pyenv, which is not installed".format(parser.prog)
             print(msg)
             return 1
 
@@ -127,7 +122,7 @@ class Pyvb():
         environments = []
         for majmin in self.minor_pythons():
             env = Environment()
-            env.name = '{}-{}'.format(args.basename, majmin)
+            env.name = "{}-{}".format(args.basename, majmin)
             env.version = self.find_latest_version(pythons, majmin)
             environments.append(env)
 
@@ -142,27 +137,27 @@ class Pyvb():
 
     def get_pythons(self):
         """Use pyenv to get a list of pythons that are available to us"""
-        self.status_message('retrieving available pythons from pyenv')
+        self.status_message("retrieving available pythons from pyenv")
 
         process = subprocess.run(
-            ['pyenv', 'install', '--list'],
+            ["pyenv", "install", "--list"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
             check=True,
-            )
-        pythons = process.stdout.split('\n')
+        )
+        pythons = process.stdout.split("\n")
         return pythons
 
     def have_pyenv(self):
         """Check if pyenv is installed"""
-        self.status_message('checking if pyenv is installed')
+        self.status_message("checking if pyenv is installed")
         process = subprocess.run(
-            ['pyenv', '--version'],
+            ["pyenv", "--version"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            check=False
+            check=False,
         )
         return process.returncode == 0
 
@@ -189,7 +184,7 @@ class Pyvb():
         pythons = list(map(lambda x: x.strip(), pythons))
 
         # ignore dev, beta and rc versions
-        prereleases = re.compile(r'(dev$|rc[0-9]+$|b[0-9]+$)')
+        prereleases = re.compile(r"(dev$|rc[0-9]+$|b[0-9]+$)")
         pythons = list(filter(lambda x: not prereleases.search(x), pythons))
 
         # iterate the list backwards (we want the highest version, which appears
@@ -204,14 +199,16 @@ class Pyvb():
     def create_environment(self, env):
         """Create an environment specified by the passed instance of an Environment class"""
         self.install_python(env.version)
-        self.status_message('deleting environment {}'.format(env.name))
+        self.status_message("deleting environment {}".format(env.name))
         if not self.dryrun:
-            subprocess.run(['pyenv', 'uninstall', '-f', env.name], check=False)
+            subprocess.run(["pyenv", "uninstall", "-f", env.name], check=False)
 
-        self.status_message('creating environment {} with version {}'.format(env.name, env.version))
+        self.status_message(
+            "creating environment {} with version {}".format(env.name, env.version)
+        )
         if not self.dryrun:
-            argv = ['pyenv', 'virtualenv', '-p']
-            argv.append('python{}'.format(env.major_minor))
+            argv = ["pyenv", "virtualenv", "-p"]
+            argv.append("python{}".format(env.major_minor))
             argv.append(env.version)
             argv.append(env.name)
             subprocess.run(argv, check=True)
@@ -223,9 +220,8 @@ class Pyvb():
 
         Throws a CalledProcessError exception if an error occurs
         """
-        self.status_message('running pyenv to install python {}'.format(version))
+        self.status_message("running pyenv to install python {}".format(version))
         if not self.dryrun:
             subprocess.run(
-                ['pyenv', 'install', '-s', version],
-                check=True,
+                ["pyenv", "install", "-s", version], check=True,
             )

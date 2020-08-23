@@ -26,16 +26,18 @@ pyvb test suite
 
 import pyvb
 
+
 def test_find_latest_version(pythons):
-    #pyfunc = mocker.patch("pyvb.pyvb.get_pythons")
-    #pyfunc.return_value = pythons
+    # pyfunc = mocker.patch("pyvb.pyvb.get_pythons")
+    # pyfunc.return_value = pythons
     prog = pyvb.Pyvb()
-    assert prog.find_latest_version(pythons, '3.8') == '3.8.1'
-    assert prog.find_latest_version(pythons, '1.4') is None
-    assert prog.find_latest_version(pythons, 'fred') is None
-    assert prog.find_latest_version(pythons, '3.9') is None
-    assert prog.find_latest_version(pythons, '3.6') == '3.6.10'
+    assert prog.find_latest_version(pythons, "3.8") == "3.8.1"
+    assert prog.find_latest_version(pythons, "1.4") is None
+    assert prog.find_latest_version(pythons, "fred") is None
+    assert prog.find_latest_version(pythons, "3.9") is None
+    assert prog.find_latest_version(pythons, "3.6") == "3.6.10"
+
 
 def test_environment():
-    env = pyvb.pyvb.Environment('fred', '3.8.1')
-    assert env.major_minor == '3.8'
+    env = pyvb.pyvb.Environment("fred", "3.8.1")
+    assert env.major_minor == "3.8"
