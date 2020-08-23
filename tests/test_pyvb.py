@@ -34,6 +34,7 @@ def test_find_latest_version(pythons):
     assert prog.find_latest_version(pythons, '1.4') is None
     assert prog.find_latest_version(pythons, 'fred') is None
     assert prog.find_latest_version(pythons, '3.9') is None
+    assert prog.find_latest_version(pythons, '3.6') == '3.6.10'
 
 def test_environment():
     env = pyvb.pyvb.Environment('fred', '3.8.1')
