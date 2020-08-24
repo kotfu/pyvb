@@ -27,6 +27,7 @@ Entry point for 'pyvb' command line program
 import argparse
 import subprocess
 import re
+from typing import List
 
 import pyvb
 
@@ -57,9 +58,9 @@ class Pyvb:
         """initialize"""
         self.dryrun = False
         self.verbose = False
+        self._all_pythons = None
 
-    @classmethod
-    def _build_parser(cls):
+    def _build_parser(self):
         """Build the argument parser"""
         parser = argparse.ArgumentParser(
             description="Create pyenv and virtualenv python environments",
@@ -73,6 +74,14 @@ class Pyvb:
 
         # append_help = 'created environment names to .python-version in the current directory'
         # parser.add_argument('-a', '--append', action='store_true', help=append_help)
+
+        pythons_help = """Specify python versions. Default latest patch release for all
+        supported minor versions. Use more than once or separate versions with commas to
+        specify multiple versions.
+        """
+        parser.add_argument(
+            "--python", "-p", action="append", help=pythons_help,
+        )
 
         dryrun_help = "Don't execute anything, but show what would be done. Implies -v."
         parser.add_argument(
@@ -90,6 +99,40 @@ class Pyvb:
         )
 
         return parser
+
+    def select_pythons(self, pythons: List) -> List:
+        """Build a list of pythons to install
+
+        :pythons: a list of python versions to include. If the list is empty
+                  or None, the use a default list of python versions
+
+        Each element in the list can contain a comma separated list of versions
+        formatted like MAJOR.MINOR.PATCH. If MINOR or PATCH is omitted, this method
+        will attempt to find the highest MINOR and PATCH in the available list
+        """
+        # use a default list if none was provided
+        if not pythons:
+            pythons = self.default_pythons()
+
+        # elements in pythons can be comma separated, let's expand those and build
+        # a new list
+        requested_pythons = []
+        for python in pythons:
+            requested_pythons.extend(python.split(","))
+        # strip the spaces off
+        requested_pythons = [x.strip() for x in requested_pythons]
+
+        selected = []
+        for python in requested_pythons:
+            if python in self.all_pythons():
+                # we have an exact match, use that version
+                selected.append(python)
+            else:
+                # assume python is a major.minor and see if we can find the latest patch version
+                found = self.find_latest_version(python)
+                if found:
+                    selected.append(found)
+        return selected
 
     def status_message(self, msg):
         """display a status message"""
@@ -117,13 +160,15 @@ class Pyvb:
             print(msg)
             return 1
 
+        # decide which minor_pythons we are going to install/use
+        selected_pythons = self.select_pythons(args.python)
+
         # build a list of environments
-        pythons = self.get_pythons()
         environments = []
-        for majmin in self.minor_pythons():
+        for majmin in selected_pythons:
             env = Environment()
             env.name = "{}-{}".format(args.basename, majmin)
-            env.version = self.find_latest_version(pythons, majmin)
+            env.version = self.find_latest_version(majmin)
             environments.append(env)
 
         # create each environment
@@ -135,7 +180,19 @@ class Pyvb:
 
         return 0
 
-    def get_pythons(self):
+    def all_pythons(self) -> List:
+        """Return a list of all available python versions as a list"""
+        # cache the list
+        if not self._all_pythons:
+            as_string = self._get_all_pythons()
+            pythons = as_string.split("\n")
+            # the first element of this list says "Available versions:"
+            _ = pythons.pop(0)
+            # and each python version is indented by a couple spaces
+            self._all_pythons = [x.strip() for x in pythons]
+        return self._all_pythons
+
+    def _get_all_pythons(self) -> str:
         """Use pyenv to get a list of pythons that are available to us"""
         self.status_message("retrieving available pythons from pyenv")
 
@@ -146,8 +203,7 @@ class Pyvb:
             text=True,
             check=True,
         )
-        pythons = process.stdout.split("\n")
-        return pythons
+        return process.stdout
 
     def have_pyenv(self):
         """Check if pyenv is installed"""
@@ -162,30 +218,26 @@ class Pyvb:
         return process.returncode == 0
 
     @classmethod
-    def minor_pythons(cls):
+    def default_pythons(cls):
         """Return a list of standard python major.minor versions
 
         Standard python versions are those that are not deprecated.
         """
         return ["3.8", "3.7", "3.6", "3.5"]
 
-    @classmethod
-    def find_latest_version(cls, pythons, major_minor):
+    def find_latest_version(self, major_minor):
         """Given a major.minor specifier, find the latest available python version to pyenv
 
         >>> pythons = getfixture('pythons')
         >>> prog = Pyvb()
-        >>> print(prog.find_latest_version(pythons, '3.4'))
+        >>> print(prog.find_latest_version('3.4'))
         3.4.10
 
         :return: a version string like 3.8.1 or None if there are no matches
         """
-        # strip spaces
-        pythons = list(map(lambda x: x.strip(), pythons))
-
         # ignore dev, beta and rc versions
         prereleases = re.compile(r"(dev$|rc[0-9]+$|b[0-9]+$)")
-        pythons = list(filter(lambda x: not prereleases.search(x), pythons))
+        pythons = list(filter(lambda x: not prereleases.search(x), self.all_pythons()))
 
         # iterate the list backwards (we want the highest version, which appears
         # later in the `pyenv` output) to find the highest matching version

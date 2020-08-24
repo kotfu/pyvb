@@ -27,17 +27,29 @@ pyvb test suite
 import pyvb
 
 
-def test_find_latest_version(pythons):
-    # pyfunc = mocker.patch("pyvb.pyvb.get_pythons")
-    # pyfunc.return_value = pythons
-    prog = pyvb.Pyvb()
-    assert prog.find_latest_version(pythons, "3.8") == "3.8.1"
-    assert prog.find_latest_version(pythons, "1.4") is None
-    assert prog.find_latest_version(pythons, "fred") is None
-    assert prog.find_latest_version(pythons, "3.9") is None
-    assert prog.find_latest_version(pythons, "3.6") == "3.6.10"
+def test_find_latest_version(prog):
+    assert prog.find_latest_version("3.8") == "3.8.1"
+    assert prog.find_latest_version("1.4") is None
+    assert prog.find_latest_version("fred") is None
+    assert prog.find_latest_version("3.9") is None
+    assert prog.find_latest_version("3.6") == "3.6.10"
 
 
 def test_environment():
     env = pyvb.pyvb.Environment("fred", "3.8.1")
     assert env.major_minor == "3.8"
+
+
+def test_select_pythons_commas(prog):
+    assert prog.select_pythons(["3.7.1, 3.8.1"]) == ["3.7.1", "3.8.1"]
+    assert prog.select_pythons(["3.6.0,3.7.1,3.8.0"]) == ["3.6.0", "3.7.1", "3.8.0"]
+    assert prog.select_pythons(["3.6", "3.7,3.8"]) == ["3.6.10", "3.7.6", "3.8.1"]
+
+
+def test_select_pythons_exact(prog):
+    assert prog.select_pythons(["3.8.1"]) == ["3.8.1"]
+
+
+def test_all_pythons(prog, pythons):
+    all_pythons = prog.all_pythons()
+    assert len(all_pythons) == len(pythons.split("\n")) - 1
