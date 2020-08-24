@@ -1,5 +1,3 @@
-pyvb
-=============
-
-Python Virtual Environment Builder
+Python Virtual Environment Builder (pyvb)
+=========================================
 
