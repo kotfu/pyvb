@@ -223,7 +223,7 @@ class Pyvb:
 
         Standard python versions are those that are not deprecated.
         """
-        return ["3.8", "3.7", "3.6", "3.5"]
+        return ["3.9", "3.8", "3.7", "3.6"]
 
     def find_latest_version(self, major_minor):
         """Given a major.minor specifier, find the latest available python version to pyenv
